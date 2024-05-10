@@ -1,4 +1,4 @@
-# DataSebo
+# DataSebo 📕
 Neste projeto , propomos a criação de um aplicativo dedicado a sebos, com o objetivo de oferecer uma solução prática e gratuita que simplifique o gerenciamento de livros e promova o desenvolvimento em programação entre os alunos participantes. A iniciativa visa não apenas modernizar a gestão desses estabelecimentos, mas também proporcionar uma experiência de aprendizado enriquecedora para os estudantes envolvidos.
 
 # Projeto Integrador
