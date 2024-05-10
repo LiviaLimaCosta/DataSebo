@@ -31,11 +31,27 @@ O link acima levará você até a plataforma do Figma, lá será possível ver a
 - Visual Studio Code
 - Python
 
-## Pessoas Desenvolvedoras do Projeto
+# Autores
 
-- ![Vitória Magar Kamizono](https://avatars.githubusercontent.com/u/101277316?v=4) [Vitória Magar Kamizono](https://github.com/vivikamizono)
-- ![Vitor Azevedo](https://avatars.githubusercontent.com/u/130508410?v=4) [Vitor Azevedo](https://github.com/Vit-azevas)
-- ![Diego Lutz](https://avatars.githubusercontent.com/u/161089530?v=4) [Diego Lutz](https://github.com/Lutzzzz)
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/LiviaLimaCosta">
+        <img loading="lazy" src="https://avatars.githubusercontent.com/u/90811466?v=4" width=115 alt="Livia Lima Costa">
+        <br>
+        <sub>Livia Lima Costa</sub>
+      </a>
+    </td>
+   <td align="center">
+      <a href="https://github.com/Lutzzzz">
+        <img loading="lazy" src="https://avatars.githubusercontent.com/u/161089530?v=4" width=115 alt="Diego Lutz">
+        <br>
+        <sub>Diego Lutz</sub>
+      </a>
+    </td>    
+  </tr>
+</table>
+
 
 ## Conclusão 📕
 
