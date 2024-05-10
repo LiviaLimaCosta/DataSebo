@@ -1,5 +1,6 @@
 # DataSebo
-É uma atividade educacional que tem como objetivo aplicar os conhecimentos adquiridos durante um curso. Desenvolvido em equipe, envolve a resolução de problemas reais, pesquisa, análise crítica, planejamento e apresentação de resultados.
+Neste projeto , propomos a criação de um aplicativo dedicado a sebos, com o objetivo de oferecer uma solução prática e gratuita que simplifique o gerenciamento de livros e promova o desenvolvimento em programação entre os alunos participantes. A iniciativa visa não apenas modernizar a gestão desses estabelecimentos, mas também proporcionar uma experiência de aprendizado enriquecedora para os estudantes envolvidos.
+
 # Projeto Integrador
 
 ![Badge de Status](https://img.shields.io/badge/Status-DESENVOLVENDO-yellow)
@@ -56,4 +57,4 @@ O link acima levará você até a plataforma do Figma, lá será possível ver a
 
 ## Conclusão 📕
 
-O projeto foi realizado com o intuito de ajudar a sociedade e o meio ambiente, e eu creio que ele realmente é capaz disso, foi nosso primeiro projeto do zero e que podemos ter uma visão de como é colocar a mão na massa, pensar e raciocinar sobre o que deveríamos fazer naquele momento, por mais simples que tenha ficado o projeto, ele pode ser melhorado com o tempo até chegar a realmente ser utilizado por uma empresa.
+Ao concluir este projeto, estamos não apenas apresentando uma solução inovadora para os desafios enfrentados pelos livreiros de sebos, mas também demonstrando o potencial da tecnologia como uma ferramenta para o desenvolvimento social e educacional. Esperamos que este aplicativo não apenas simplifique as operações diárias dos sebos, mas também inspire outros projetos semelhantes, incentivando o uso da tecnologia para promover mudanças positivas em nossas comunidades.
