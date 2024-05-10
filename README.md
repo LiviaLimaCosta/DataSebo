@@ -16,7 +16,7 @@ O projeto integrador é uma atividade educacional que visa integrar e aplicar os
 
 ## Acesso ao Projeto 📁
 
-[![Figma](https://cdn.icon-icons.com/icons2/2429/PNG/512/figma_logo_icon_147289.png)](https://www.figma.com/file/h42752sAezu9U5DWuWudta/Untitled?type=design&node-id=0%3A1&mode=design&t=6NDp4RLg5tayW5L4-1)
+[<img src="https://cdn.icon-icons.com/icons2/2429/PNG/512/figma_logo_icon_147289.png" alt="Figma" width="115">](https://www.figma.com/file/h42752sAezu9U5DWuWudta/Untitled?type=design&node-id=0%3A1&mode=design&t=6NDp4RLg5tayW5L4-1)
 
 O link acima levará você até a plataforma do Figma, lá será possível ver a parte visual de como seria o projeto rodando como um aplicativo nos celulares.
 
