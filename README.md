@@ -6,15 +6,16 @@
 
 ## Descrição do Projeto 💻
 
-O projeto integrador é uma atividade educacional que visa integrar e aplicar os conhecimentos adquiridos ao longo de um curso ou disciplina. Geralmente desenvolvido individualmente ou em equipe, envolve a resolução de problemas reais, pesquisa, análise crítica, planejamento e apresentação de resultados. Com foco na interdisciplinaridade, promove habilidades como trabalho em equipe e comunicação. Esses projetos proporcionam aos alunos a oportunidade de desenvolver projetos significativos, demonstrando suas habilidades para potenciais empregadores ou para a comunidade acadêmica.
+O projeto integrador representa uma abordagem educacional que busca a integração e aplicação prática dos conhecimentos obtidos ao longo de um curso ou disciplina. Típicamente conduzido em equipe, ele implica na resolução de desafios reais, pesquisa ativa, avaliação crítica, planejamento estratégico e exposição de resultados. Com ênfase na interdisciplinaridade, fomenta o desenvolvimento de competências essenciais como colaboração e comunicação eficaz. Esses projetos oferecem aos alunos a oportunidade de conceber e concretizar iniciativas significativas, evidenciando suas aptidões tanto para possíveis empregadores quanto para a comunidade acadêmica.
 
 ## Funcionalidades do Projeto :hammer:
 
-- **Funcionalidade 1:** Pensar em uma tecnologia que possa ajudar comércios locais.
-- **Funcionalidade 2:** Ter fácil acesso para que empresas de qualquer modalidade possam aderir.
-- **Funcionalidade 3:** Ser prática e eficiente.
+- **Funcionalidade 1:** Desenvolvimento de uma tecnologia que facilite o registro de livros em sebos e livrarias locais, garantindo praticidade e segurança.
+- **Funcionalidade 2:** Implementação de um sistema de fácil acesso, permitindo que empresas de pequeno porte, como sebos e livrarias locais, possam aderir ao aplicativo de forma rápida e intuitiva.
+- **Funcionalidade 3:** Desenvolvimento de uma interface prática e eficiente, visando simplificar o processo de registro de livros, garantindo agilidade e eficácia na gestão do estoque.
 
-## Acesso ao Projeto 📁
+
+<!--## Acesso ao Projeto 📁
 
 [<img src="https://cdn.icon-icons.com/icons2/2429/PNG/512/figma_logo_icon_147289.png" alt="Figma" width="115">](https://www.figma.com/file/h42752sAezu9U5DWuWudta/Untitled?type=design&node-id=0%3A1&mode=design&t=6NDp4RLg5tayW5L4-1)
 
@@ -22,14 +23,14 @@ O link acima levará você até a plataforma do Figma, lá será possível ver a
 
 ## Abrir e Rodar o Projeto 🛠️
 
-O link acima levará você até a plataforma do Figma, lá será possível ver a parte visual de como seria o projeto rodando como um aplicativo nos celulares.
+O link acima levará você até a plataforma do Figma, lá será possível ver a parte visual de como seria o projeto rodando como um aplicativo nos celulares.-->
 
 ## Tecnologias Utilizadas 🖥️
 
-- Programação Orientada à Objetos
-- Figma
-- Visual Studio Code
 - Python
+- Visual Studio Code
+- Excel para salvar os dados
+- Sqlite3 para salvar os dados
 
 # Autores
 
