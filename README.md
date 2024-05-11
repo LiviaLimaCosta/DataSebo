@@ -55,7 +55,7 @@ O link acima levará você até a plataforma do Figma, lá será possível ver a
       </a>
     </td>   
      <td align="center">
-      <a href="(https://github.com/00Ronald71)">
+      <a href="https://github.com/00Ronald71">
         <img loading="lazy" src="https://avatars.githubusercontent.com/u/164273811?v=4" width=115 alt="00Ronald71">
         <br>
         <sub>Ronald dos Santos</sub>
