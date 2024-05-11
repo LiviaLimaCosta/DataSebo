@@ -33,6 +33,9 @@ O link acima levará você até a plataforma do Figma, lá será possível ver a
 - Excel para salvar os dados
 - Sqlite3 para salvar os dados
 
+## Diagrama do projeto
+[<img src="https://cdn-icons-png.freepik.com/512/481/481821.png" alt="Diagrama" width="115">](google.com)
+
 # Autores
 
 <table>
