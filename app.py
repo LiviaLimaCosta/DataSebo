@@ -2,7 +2,23 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import requests
-from openpyxl import Workbook, load_workbook
+import sqlite3
+
+def inicializar_bd():
+    conn = sqlite3.connect('livros.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS livros (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        isbn TEXT,
+        nome TEXT NOT NULL,
+        autor TEXT,
+        preco REAL,
+        quantidade INTEGER
+    )
+    ''')
+    conn.commit()
+    conn.close()
 
 def salvar_livro():
     isbn = entry_isbn.get()
@@ -11,39 +27,27 @@ def salvar_livro():
     preco = entry_preco.get()
     quantidade = entry_quantidade.get()
 
-    # Verifica se o campo de nome está vazio
     if not nome:
         messagebox.showerror("Erro", "Por favor, insira o nome do livro.")
         return
 
-    # Verifica se o arquivo já existe ou cria um novo
-    try:
-        wb = load_workbook("livros.xlsx")
-        ws = wb.active
-    except FileNotFoundError:
-        wb = Workbook()
-        ws = wb.active
-        ws.append(["ISBN", "Nome", "Autor", "Preço", "Quantidade"])
+    conn = sqlite3.connect('livros.db')
+    cursor = conn.cursor()
 
-    # Verifica se o livro já existe na planilha
-    livro_existente = False
-    row_index = 0
-    for idx, row in enumerate(ws.iter_rows(min_row=2, max_col=3, max_row=ws.max_row, values_only=True), start=2):
-        if (row[0] == isbn) or ((row[1] == nome) and (row[2] == autor)):
-            row_index = idx
-            ws.cell(row=row_index, column=5).value = int(ws.cell(row=row_index, column=5).value) + int(quantidade if quantidade else 1)
-            livro_existente = True
-            break
+    cursor.execute('SELECT id, quantidade FROM livros WHERE isbn=? OR (nome=? AND autor=?)', (isbn, nome, autor))
+    livro = cursor.fetchone()
 
-    # Se o livro não existir, adiciona-o à planilha
-    if not livro_existente:
-        row_index = ws.max_row + 1
-        ws.append([isbn, nome, autor, preco if preco else None, quantidade if quantidade else 1])
+    if livro:
+        cursor.execute('UPDATE livros SET quantidade = quantidade + ? WHERE id = ?', (quantidade if quantidade else 1, livro[0]))
+    else:
+        cursor.execute('''
+        INSERT INTO livros (isbn, nome, autor, preco, quantidade) VALUES (?, ?, ?, ?, ?)
+        ''', (isbn, nome, autor, preco if preco else None, quantidade if quantidade else 1))
 
-    # Salva as alterações no arquivo
-    wb.save("livros.xlsx")
+    conn.commit()
+    conn.close()
     limpar_campos()
-    entry_busca.delete(0, tk.END)  # Limpa o campo de pesquisa
+    entry_busca.delete(0, tk.END)
     label_status.config(text="Livro adicionado com sucesso!")
     atualizar_tabela()
 
@@ -53,44 +57,56 @@ def editar_livro():
         messagebox.showerror("Erro", "Selecione um livro para editar.")
         return
 
-    # Obter o índice da linha selecionada na tabela
-    row_index = int(table.index(selected_item)) + 1
+    item_id = table.item(selected_item)['values'][0]
 
-    # Verifica se o arquivo existe
-    try:
-        wb = load_workbook("livros.xlsx")
-        ws = wb.active
-    except FileNotFoundError:
-        messagebox.showerror("Erro", "Nenhum livro encontrado.")
-        return
+    conn = sqlite3.connect('livros.db')
+    cursor = conn.cursor()
 
-    # Obter as informações atuais do livro na planilha
-    isbn_atual = ws.cell(row=row_index, column=1).value
-    nome_atual = ws.cell(row=row_index, column=2).value
-    autor_atual = ws.cell(row=row_index, column=3).value
-    preco_atual = ws.cell(row=row_index, column=4).value
-    quantidade_atual = ws.cell(row=row_index, column=5).value
+    # Buscar os dados atuais do livro
+    cursor.execute('SELECT * FROM livros WHERE id = ?', (item_id,))
+    livro_atual = cursor.fetchone()
 
-    # Obter as novas informações do livro dos campos de entrada
+    # Obter os novos valores dos campos
     isbn_novo = entry_isbn.get()
     nome_novo = entry_nome.get()
     autor_novo = entry_autor.get()
     preco_novo = entry_preco.get()
     quantidade_novo = entry_quantidade.get()
 
-    # Atualizar as informações do livro na planilha
-    ws.cell(row=row_index, column=1).value = isbn_novo if isbn_novo else isbn_atual
-    ws.cell(row=row_index, column=2).value = nome_novo if nome_novo else nome_atual
-    ws.cell(row=row_index, column=3).value = autor_novo if autor_novo else autor_atual
-    ws.cell(row=row_index, column=4).value = preco_novo if preco_novo else preco_atual
-    ws.cell(row=row_index, column=5).value = quantidade_novo if quantidade_novo else quantidade_atual
+    # Verificar quais campos foram preenchidos e atualizar apenas esses campos no banco de dados
+    atualizacoes = {}
+    if isbn_novo and isbn_novo != livro_atual[1]:
+        atualizacoes['isbn'] = isbn_novo
+    if nome_novo and nome_novo != livro_atual[2]:
+        atualizacoes['nome'] = nome_novo
+    if autor_novo and autor_novo != livro_atual[3]:
+        atualizacoes['autor'] = autor_novo
+    if preco_novo and preco_novo != livro_atual[4]:
+        atualizacoes['preco'] = preco_novo
+    if quantidade_novo and quantidade_novo != livro_atual[5]:
+        atualizacoes['quantidade'] = quantidade_novo
 
-    # Salvar as alterações no arquivo
-    wb.save("livros.xlsx")
-    limpar_campos()
-    entry_busca.delete(0, tk.END)  # Limpa o campo de pesquisa
-    label_status.config(text="Livro editado com sucesso!")
-    atualizar_tabela()
+    # Gerar a string de atualização dinamicamente
+    if atualizacoes:
+        set_string = ', '.join([f"{key} = ?" for key in atualizacoes.keys()])
+        values = tuple(atualizacoes.values())
+        query = f'''
+        UPDATE livros
+        SET {set_string}
+        WHERE id = ?
+        '''
+        # Adicionar o ID do livro ao final da tupla de valores
+        values += (item_id,)
+        cursor.execute(query, values)
+        conn.commit()
+        conn.close()
+        limpar_campos()
+        entry_busca.delete(0, tk.END)
+        label_status.config(text="Livro editado com sucesso!")
+        atualizar_tabela()
+    else:
+        messagebox.showinfo("Informação", "Nenhum campo foi alterado.")
+
 
 def deletar_livro():
     selected_item = table.selection()
@@ -98,24 +114,15 @@ def deletar_livro():
         messagebox.showerror("Erro", "Selecione um livro para deletar.")
         return
 
-    # Obter o índice da linha selecionada na tabela
-    row_index = int(table.index(selected_item)) + 1
+    item_id = table.item(selected_item)['values'][0]
 
-    # Verifica se o arquivo existe
-    try:
-        wb = load_workbook("livros.xlsx")
-        ws = wb.active
-    except FileNotFoundError:
-        messagebox.showerror("Erro", "Nenhum livro encontrado.")
-        return
-
-    # Deletar o livro da planilha
-    ws.delete_rows(row_index)
-
-    # Salvar as alterações no arquivo
-    wb.save("livros.xlsx")
+    conn = sqlite3.connect('livros.db')
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM livros WHERE id = ?', (item_id,))
+    conn.commit()
+    conn.close()
     limpar_campos()
-    entry_busca.delete(0, tk.END)  # Limpa o campo de pesquisa
+    entry_busca.delete(0, tk.END)
     label_status.config(text="Livro deletado com sucesso!")
     atualizar_tabela()
 
@@ -160,26 +167,74 @@ def limpar_campos():
     entry_quantidade.delete(0, tk.END)
 
 def atualizar_tabela():
-    try:
-        wb = load_workbook("livros.xlsx")
-        ws = wb.active
+    conn = sqlite3.connect('livros.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM livros')
+    rows = cursor.fetchall()
+    conn.close()
 
-        # Limpar tabela atual
-        for row in table.get_children():
-            table.delete(row)
+    for row in table.get_children():
+        table.delete(row)
 
-        # Atualizar tabela com os livros
-        for i, row in enumerate(ws.iter_rows(values_only=True), start=1):
-            table.insert("", "end", text=str(i), values=row)
+    for row in rows:
+        table.insert("", "end", values=row)
 
-    except FileNotFoundError:
-        label_status.config(text="Nenhum livro encontrado.")
+def abrir_pesquisa(root):
+    pesquisa_window = tk.Toplevel(root)
+    pesquisa_window.title("Pesquisa de Livros")
+
+    label_pesquisa_termo = tk.Label(pesquisa_window, text="Pesquisar por ISBN ou Nome:")
+    label_pesquisa_termo.grid(row=0, column=0, padx=10, pady=5)
+    entry_pesquisa = tk.Entry(pesquisa_window)
+    entry_pesquisa.grid(row=0, column=1, padx=10, pady=5)
+
+    button_pesquisar = tk.Button(pesquisa_window, text="Pesquisar", command=lambda: pesquisar_livros_pesquisa(entry_pesquisa.get(), tabela_pesquisa))
+    button_pesquisar.grid(row=0, column=2, padx=10, pady=5)
+
+    tabela_pesquisa_frame = tk.Frame(pesquisa_window)
+    tabela_pesquisa_frame.grid(row=1, column=0, columnspan=3, padx=10, pady=5, sticky="NSEW")
+
+    tabela_pesquisa = ttk.Treeview(tabela_pesquisa_frame, columns=("ID", "ISBN", "Nome", "Autor", "Preço", "Quantidade"), show="headings")
+    tabela_pesquisa.heading("ID", text="ID")
+    tabela_pesquisa.heading("ISBN", text="ISBN")
+    tabela_pesquisa.heading("Nome", text="Nome")
+    tabela_pesquisa.heading("Autor", text="Autor")
+    tabela_pesquisa.heading("Preço", text="Preço")
+    tabela_pesquisa.heading("Quantidade", text="Quantidade")
+    tabela_pesquisa.pack(expand=True, fill="both")
+
+    for col in ("ID", "ISBN", "Nome", "Autor", "Preço", "Quantidade"):
+        tabela_pesquisa.column(col, width=120, anchor="w")
+
+def pesquisar_livros_pesquisa(query, tabela_pesquisa):
+    if not query:
+        messagebox.showerror("Erro", "Digite um ISBN ou nome de livro para pesquisar.")
+        return
+    conn = sqlite3.connect('livros.db')
+    cursor = conn.cursor()
+
+    cursor.execute('''
+    SELECT * FROM livros
+    WHERE isbn LIKE ? OR nome LIKE ?
+    ''', ('%' + query + '%', '%' + query + '%'))
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    for row in tabela_pesquisa.get_children():
+        tabela_pesquisa.delete(row)
+
+    for row in rows:
+        tabela_pesquisa.insert("", "end", values=row)
+
+# Inicializar o banco de dados
+inicializar_bd()
 
 root = tk.Tk()
 root.title("Gerenciador de Livros")
 root_width = root.winfo_screenwidth() // 2
 root_height = root.winfo_screenheight() // 2
-root.geometry(f"{root_width}x{root_height}")
+root.geometry(f"{1050}x{450}")
 
 label_isbn = tk.Label(root, text="ISBN:")
 label_isbn.grid(row=0, column=0, padx=10, pady=5)
@@ -230,9 +285,8 @@ label_status.grid(row=9, column=0, columnspan=3, padx=10, pady=5)
 table_frame = tk.Frame(root)
 table_frame.grid(row=0, column=3, rowspan=10, padx=10, pady=5, sticky="NSEW")
 
-table = ttk.Treeview(table_frame, columns=("ISBN", "Nome", "Autor", "Preço", "Quantidade"))
-table.heading("#0", text="ID")
-table.column("#0", width=30)
+table = ttk.Treeview(table_frame, columns=("ID", "ISBN", "Nome", "Autor", "Preço", "Quantidade"), show="headings")
+table.heading("ID", text="ID")
 table.heading("ISBN", text="ISBN")
 table.heading("Nome", text="Nome")
 table.heading("Autor", text="Autor")
@@ -240,51 +294,21 @@ table.heading("Preço", text="Preço")
 table.heading("Quantidade", text="Quantidade")
 table.pack(expand=True, fill="both")
 
-# Calcular a largura e a altura mínimas necessárias para exibir todos os elementos sem cortes
-min_width = max(1200, root.winfo_reqwidth())
-min_height = max(350, root.winfo_reqheight())
-
-# Definir o tamanho da janela
-root.minsize(min_width, min_height)
-
-
-# Definir a largura e a altura máximas da Treeview
-max_table_width = int(root_width * 0.9)
-max_table_height = int(root_height * 0.9)
-
-# Verificar se a largura e a altura da Treeview excedem os limites máximos
-table_width = min(max_table_width, table.winfo_reqwidth())
-table_height = min(max_table_height, table.winfo_reqheight())
-
-# Criar a Treeview com o Frame
-table_frame = tk.Frame(root)
-table_frame.grid(row=0, column=3, rowspan=10, padx=10, pady=5, sticky="NSEW")
-
-# Criar a Treeview
-table = ttk.Treeview(table_frame, columns=("ISBN", "Nome", "Autor", "Preço", "Quantidade"), show="headings")
-table.grid(row=0, column=0, sticky="NSEW")
-
-# Criar as Scrollbars
-vsb = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
-vsb.grid(row=0, column=1, sticky="NS")
-hsb = ttk.Scrollbar(table_frame, orient="horizontal", command=table.xview)
-hsb.grid(row=1, column=0, sticky="EW")
-
-# Configurar as Scrollbars
-table.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
-
 # Configurar o redimensionamento das colunas
-table.column("#0", width=30, anchor="center")
-table.column("ISBN", width=int(table_width * 0.2), anchor="w")  # Alinhado à esquerda
-table.column("Nome", width=int(table_width * 0.3), anchor="w")  # Alinhado à esquerda
-table.column("Autor", width=int(table_width * 0.2), anchor="w")  # Alinhado à esquerda
-table.column("Preço", width=70, anchor="w")  # Largura para 7 dígitos, alinhado à esquerda
-table.column("Quantidade", width=70, anchor="w")  # Largura para 7 dígitos, alinhado à esquerda
+table.column("ID", width=30, anchor="center")
+table.column("ISBN", width=120, anchor="w")
+table.column("Nome", width=200, anchor="w")
+table.column("Autor", width=150, anchor="w")
+table.column("Preço", width=70, anchor="w")
+table.column("Quantidade", width=70, anchor="w")
 
-for col in ("ISBN", "Nome", "Autor", "Preço", "Quantidade"):
-    table.heading(col, text=col)
-
-# Adicionar os livros à tabela
+# Atualizar a tabela de visualização com os dados do banco de dados
 atualizar_tabela()
+
+label_pesquisa = tk.Label(root, text="Pesquisa de Livros")
+label_pesquisa.grid(row=10, column=0, columnspan=3, padx=10, pady=5)
+
+button_pesquisar = tk.Button(root, text="Pesquisar Livros", command=lambda: abrir_pesquisa(root))
+button_pesquisar.grid(row=11, column=0, columnspan=3, padx=10, pady=5)
 
 root.mainloop()
