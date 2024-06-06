@@ -30,15 +30,6 @@ def salvar_livro():
     if not nome:
         messagebox.showerror("Erro", "Por favor, insira o nome do livro.")
         return
-    
-    try:
-        if preco:
-            preco = float(preco)
-        if quantidade:
-            quantidade = int(quantidade)
-    except ValueError:
-        messagebox.showerror("Erro", "O preço e a quantidade devem ser números válidos.")
-        return
 
     conn = sqlite3.connect('livros.db')
     cursor = conn.cursor()
@@ -125,11 +116,6 @@ def deletar_livro():
 
     item_id = table.item(selected_item)['values'][0]
 
-    # Adicionar uma caixa de diálogo de confirmação antes de excluir o livro
-    resposta = messagebox.askyesno("Confirmação", "Tem certeza que deseja excluir este livro?")
-    if not resposta:
-        return
-
     conn = sqlite3.connect('livros.db')
     cursor = conn.cursor()
     cursor.execute('DELETE FROM livros WHERE id = ?', (item_id,))
@@ -139,7 +125,6 @@ def deletar_livro():
     entry_busca.delete(0, tk.END)
     label_status.config(text="Livro deletado com sucesso!")
     atualizar_tabela()
-
 
 def buscar_livro():
     query = entry_busca.get()
